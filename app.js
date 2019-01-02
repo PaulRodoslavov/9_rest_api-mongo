@@ -4,19 +4,21 @@
 const express = require('express');
 const morgan = require('morgan');
 const routes = require('./routes');
-
+const bodyParser = require('body-parser');
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
 
 // create the Express app
 const app = express();
 
-// Routers
-app.use(routes);
+
+
+
+app.use(bodyParser.json());
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
-// app.use(jsonParser());
+
 
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/restapi');
@@ -31,6 +33,8 @@ db.once("open", function(){
 	console.log("db connection successful");
 });
 
+// Routers
+app.use(routes);
 
 // send 404 if no other route matched
 app.use((req, res) => {
@@ -46,9 +50,10 @@ app.use((err, req, res, next) => {
   }
 
   res.status(err.status || 500).json({
+	 // message:'There is no such user with given userId',
     message: err.message,
-    error: {},
-  });
+    error: {}
+ });
 });
 
 // set our port
