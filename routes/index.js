@@ -63,7 +63,7 @@ router.post('/api/courses', middle.requiresLogin, function(req, res, next){
    const course = new Course(req.body);
    course.save( function (err, course){
       if(err) return next(err);
-      res.location('/');
+      res.location(`/api/courses/${course._id}`);
       return res.sendStatus(201);
    });
 });
@@ -119,10 +119,12 @@ router.delete("/api/courses/:cID", middle.requiresLogin, function(req, res){
 // GET /users
 // Route for users collection
 router.get('/api/users', middle.requiresLogin, (req, res, next) => {
-   User.find({})
-      .exec((err, listUsers) => {
+   const credential = auth(req);
+   const courseProps = req.body;
+   User.findOne({ emailAddress: credential.name})
+      .exec((err, user) => {
          if(err) return next(err);
-         res.json(listUsers);
+         res.json(user);
       });
 });
 
